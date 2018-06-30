@@ -1,5 +1,10 @@
 let deferredPrompt;
 
+// Check if browser support Promise
+if (!window.Promise) {
+    window.Promise = Promise;
+}
+
 // Check if serviceWorker avaliable in Browser
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker
@@ -20,8 +25,8 @@ window.addEventListener('beforeinstallprompt', (event) => {
 });
 
 // Understanding fetch method (GET request)
-// fetch('http://httpbin.org/ip')
-fetch('http://httpbin.org/ips') // Wrong URL
+fetch('http://httpbin.org/ip')
+// fetch('http://httpbin.org/ips') // Wrong URL
     .then((res) => {
         console.log(res);
         return res.json();
