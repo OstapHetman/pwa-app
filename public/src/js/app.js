@@ -1,62 +1,96 @@
-let deferredPrompt;
 
-// Check if browser support Promise
+var deferredPrompt;
+
 if (!window.Promise) {
-    window.Promise = Promise;
+  window.Promise = Promise;
 }
 
-// Check if serviceWorker avaliable in Browser
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker
-        .register('/service-worker.js')
-        .then( () => {
-            console.log('Service worker registered');    
-        }).catch( (err) => {
-            console.log(err)
-        });
+  navigator.serviceWorker
+    .register('/sw.js')
+    .then(function () {
+      console.log('Service worker registered!');
+    })
+    .catch(function(err) {
+      console.log(err);
+    });
 }
 
-// Install Banner
-window.addEventListener('beforeinstallprompt', (event) => {
-    console.log('beforeinstallprompt fired')
-    event.preventDefault();
-    deferredPrompt = event;
-    return false;
+window.addEventListener('beforeinstallprompt', function(event) {
+  console.log('beforeinstallprompt fired');
+  event.preventDefault();
+  deferredPrompt = event;
+  return false;
 });
 
-// Understanding fetch method (GET request)
-fetch('http://httpbin.org/ip')
-// fetch('http://httpbin.org/ips') // Wrong URL
-    .then((res) => {
-        console.log(res);
-        return res.json();
-    })
-    .then((data)=>{
-        console.log(data);
-    })
-    .catch((err)=>{
-        console.log(err);
-    });
+var promise = new Promise(function(resolve, reject) {
+  setTimeout(function() {
+    //resolve('This is executed once the timer is done!');
+    reject({code: 500, message: 'An error occurred!'});
+    //console.log('This is executed once the timer is done!');
+  }, 3000);
+});
 
-// Understanding fetch method (POST request)
-fetch('http://httpbin.org/post', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-    },
-    mode: 'cors',
-    body: JSON.stringify({
-       message: 'Does this work?'
-    })
-}) // POST URL
-    .then((res) => {
-        console.log(res);
-        return res.json();
-    })
-    .then((data)=>{
-        console.log(data);
-    })
-    .catch((err)=>{
-        console.log(err);
-    });
+var xhr = new XMLHttpRequest();
+xhr.open('GET', 'https://httpbin.org/ip');
+xhr.responseType = 'json';
+
+xhr.onload = function() {
+  console.log(xhr.response);
+};
+
+xhr.onerror = function() {
+  console.log('Error!');
+};
+
+xhr.send();
+
+fetch('https://httpbin.org/ip')
+  .then(function(response) {
+    console.log(response);
+    return response.json();
+  })
+  .then(function(data) {
+    console.log(data);
+  })
+  .catch(function(err) {
+    console.log(err);
+  });
+
+fetch('https://httpbin.org/post', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  },
+  mode: 'cors',
+  body: JSON.stringify({message: 'Does this work?'})
+})
+  .then(function(response) {
+    console.log(response);
+    return response.json();
+  })
+  .then(function(data) {
+    console.log(data);
+  })
+  .catch(function(err) {
+    console.log(err);
+  });
+
+// promise.then(function(text) {
+//   return text;
+// }, function(err) {
+//   console.log(err.code, err.message)
+// }).then(function(newText) {
+//   console.log(newText);
+// });
+
+promise.then(function(text) {
+  return text;
+}).then(function(newText) {
+  console.log(newText);
+}).catch(function(err) {
+  console.log(err.code, err.message);
+});
+
+console.log('This is executed right after setTimeout()');
